@@ -7,6 +7,7 @@ from curry.token import Token
 
 
 def user_save(request):
+
     user = User(
         username='curry',
         password='123456',
