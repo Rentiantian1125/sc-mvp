@@ -3,11 +3,9 @@ from django.http import JsonResponse
 from .models import *
 from curry import models
 # from rest_framework_jwt.settings import api_settings
-from curry.token import Token
 
 
 def user_save(request):
-
     user = User(
         username='curry',
         password='123456',
@@ -52,7 +50,6 @@ def sign_in(request):
 
     name = 'curry'
     pwd = 'curry'
-    token = Token.get_token()
 
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
@@ -64,7 +61,7 @@ def sign_in(request):
         # token = jwt_encode_handler(payload)
 
         if user_obj:
-            return JsonResponse({'code': '0', 'msg': '登录成功', 'token': token})
+            return JsonResponse({'code': '0', 'msg': '登录成功', 'token': user_obj.id})
         else:
             return JsonResponse({'code': '1', 'msg': '用户名或密码错误'})
     else:
