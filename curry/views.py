@@ -2,6 +2,8 @@
 from django.http import JsonResponse
 from .models import *
 from curry import models
+
+
 # from rest_framework_jwt.settings import api_settings
 
 
@@ -21,7 +23,7 @@ def sign_up(request):
             if user_obj:
                 return JsonResponse({'code': '1', 'msg': '用户已存在'})
             else:
-                models.User.objects.create(username=name, password=pwd, gender=gender).save()
+                models.User.objects.create(username=name, password=pwd, gender=gender)
                 return JsonResponse({'code': '0', 'msg': "保存成功"})
         else:
             return JsonResponse({'code': '1', 'msg': '密码不一致'})
@@ -58,9 +60,9 @@ def search(request):
     # 按标题搜索
     title = request.POST.get('title')
     if title:
-        article_list = ArticleContent.objects.filter(title=title)
+        article_list = ArticleContent.objects.all().filter(title=title)
 
-        if article_list:
+        if len(article_list) > 0:
             return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': article_list})
         else:
             return JsonResponse({'code': '1', 'msg': '没有匹配项'})
@@ -86,10 +88,10 @@ def get_article_list(request):
     # 获取全部动态内容
     article_list = ArticleContent.objects.filter()
     # article_list = ArticleContent.objects.all()
-    if article_list:
+    if len(article_list) > 0:
         return JsonResponse({'code': '0', 'msg': '加载成功', 'article_list': article_list})
     else:
-        return JsonResponse({'code': '1', 'msg': '参数错误', 'article_list': article_list})
+        return JsonResponse({'code': '1', 'msg': '无数据'})
 
 
 def publish(request):
