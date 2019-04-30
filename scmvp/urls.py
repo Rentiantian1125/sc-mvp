@@ -19,11 +19,13 @@ from curry import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('a/', views.user_save),
     path('sign_up/', views.sign_up),
     path('sign_in/', views.sign_in),
     path('search/', views.search),
     path('myself_edit/', views.myself_edit),
     path('get_article_list/', views.get_article_list),
+    path('publish/', views.publish),
+    path('get_like_and_comment/', views.get_like_and_comment),
 
 ]
+

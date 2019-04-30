@@ -2,21 +2,19 @@
 from django.http import JsonResponse
 from .models import *
 from curry import models
-
-
 # from rest_framework_jwt.settings import api_settings
 
 
 def sign_up(request):
-    name = 'stephen'
-    pwd = '123456'
-    re_pwd = '123456'
-    gender = '1'
+    # name = 'stephen'
+    # pwd = '123456'
+    # re_pwd = '123456'
+    # gender = '1'
 
-    # name = request.POST.get('username')
-    # pwd = request.POST.get('password')
-    # re_pwd = request.POST.get('re_pwd')
-    # gender = request.POST.get('gender')
+    name = request.POST.get('username')
+    pwd = request.POST.get('password')
+    re_pwd = request.POST.get('re_pwd')
+    gender = request.POST.get('gender')
     if name and pwd and re_pwd and gender:
         if pwd == re_pwd:
             user_obj = models.User.objects.filter(username=name).first()
@@ -33,11 +31,11 @@ def sign_up(request):
 
 
 def sign_in(request):
-    # name = request.POST.get('username')
-    # pwd = request.POST.get('password')
+    name = request.POST.get('username')
+    pwd = request.POST.get('password')
 
-    name = 'curry'
-    pwd = '123456'
+    # name = 'curry'
+    # pwd = '123456'
 
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
@@ -111,4 +109,5 @@ def publish(request):
 def get_like_and_comment(request, user_id):
     # 获取用户收到的点赞及评论信息
     models.ArticleLike.objects.filter(user_id=user_id)
+    # models.ArticleLike.objects.all().filter(user_id=user_id)
     models.ArticleComment.objects.filter(user_id=user_id)
