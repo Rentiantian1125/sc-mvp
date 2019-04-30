@@ -44,3 +44,14 @@ class ArticleContent(models.Model):
 
     class Meta:
         db_table = 'article_content'
+
+
+class Post(models.Model):
+    # 标题
+    title = models.CharField(max_length=70)
+    # 正文
+    content = models.TextField()
+    # 其他属性
+
+    def __str__(self):
+        return self.title

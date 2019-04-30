@@ -2,6 +2,8 @@
 from django.http import JsonResponse
 from .models import *
 from curry import models
+
+
 # from rest_framework_jwt.settings import api_settings
 
 
@@ -49,7 +51,7 @@ def sign_in(request):
     # pwd = request.POST.get('password')
 
     name = 'curry'
-    pwd = 'curry'
+    pwd = '123456'
 
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
@@ -66,3 +68,30 @@ def sign_in(request):
             return JsonResponse({'code': '1', 'msg': '用户名或密码错误'})
     else:
         return JsonResponse({'code': '1', 'msg': '输入为空'})
+
+
+def search(request):
+    # 按标题搜索
+    title = request.POST.get('title')
+    if title:
+        article_list = ArticleContent.objects.filter(title=title)
+
+        if article_list:
+            return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': article_list})
+        else:
+            return JsonResponse({'code': '1', 'msg': '没有匹配项'})
+
+    else:
+        return JsonResponse({'code': '1', 'error_msg': '输入为空'})
+
+
+def myself_edit(request):
+    name = request.POST.get('username')
+    gender = request.POST.get('gender')
+    nick_name = request.POST.get('nick_name')
+    phone = request.POST.get('phone')
+    head_img = request.POST.get('head_img')
+    sign = request.POST.get('sign')
+
+    models.User.objects.create(username=name, gender=gender, nick_name=nick_name,
+                               phone=phone, head_img=head_img, sign=sign).save()
