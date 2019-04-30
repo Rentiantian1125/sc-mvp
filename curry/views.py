@@ -7,20 +7,6 @@ from curry import models
 # from rest_framework_jwt.settings import api_settings
 
 
-def user_save(request):
-    user = User(
-        username='curry',
-        password='123456',
-        nick_name='Curry',
-        gender='1',
-        phone='curry',
-        head_img='00000000000.jpg',
-        sign='I can do all things'
-    )
-    user.save()
-    return JsonResponse({'code': '0', 'msg': "保存成功"})
-
-
 def sign_up(request):
     name = 'stephen'
     pwd = '123456'
@@ -86,6 +72,7 @@ def search(request):
 
 
 def myself_edit(request):
+    # 修改个人信息
     name = request.POST.get('username')
     gender = request.POST.get('gender')
     nick_name = request.POST.get('nick_name')
@@ -94,4 +81,34 @@ def myself_edit(request):
     sign = request.POST.get('sign')
 
     models.User.objects.create(username=name, gender=gender, nick_name=nick_name,
-                               phone=phone, head_img=head_img, sign=sign).save()
+                               phone=phone, head_img=head_img, sign=sign)
+
+
+def get_article_list(request):
+    # 获取全部动态内容
+    article_list = ArticleContent.objects.filter()
+    # article_list = ArticleContent.objects.all()
+    if article_list:
+        return JsonResponse({'code': '0', 'msg': '加载成功', 'article_list': article_list})
+    else:
+        return JsonResponse({'code': '1', 'msg': '参数错误', 'article_list': article_list})
+
+
+def publish(request):
+    # 发表动态
+    name = request.POST.get('username')
+    title = request.POST.get('gender')
+    content = request.POST.get('nick_name')
+    img = request.POST.get('phone')
+
+    q = models.ArticleContent.objects.create(username=name, title=title, content=content, img=img)
+    if q:
+        return JsonResponse({'code': '0', 'msg': '发表成功'})
+    else:
+        return JsonResponse({'code': '1', 'msg': '发表失败'})
+
+
+def get_like_and_comment(request, user_id):
+    # 获取用户收到的点赞及评论信息
+    models.ArticleLike.objects.filter(user_id=user_id)
+    models.ArticleComment.objects.filter(user_id=user_id)
