@@ -2,6 +2,7 @@
 from django.http import JsonResponse
 from .models import *
 from curry import models
+from scmvp.token_service import token_service
 
 
 # from rest_framework_jwt.settings import api_settings
@@ -33,23 +34,18 @@ def sign_up(request):
 
 
 def sign_in(request):
-    name = request.POST.get('username')
-    pwd = request.POST.get('password')
+    # name = request.POST.get('username')
+    # pwd = request.POST.get('password')
 
-    # name = 'curry'
-    # pwd = '123456'
+    name = 'curry'
+    pwd = '123456'
 
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
 
-        # # 生成token
-        # jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
-        # jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
-        # payload = jwt_payload_handler(user_obj)
-        # token = jwt_encode_handler(payload)
-
         if user_obj:
-            return JsonResponse({'code': '0', 'msg': '登录成功', 'token': user_obj.id})
+            return JsonResponse({'code': '0', 'msg': '登录成功',
+                                 'token': token_service.create_token({'id': user_obj.id, 'name': user_obj.username})})
         else:
             return JsonResponse({'code': '1', 'msg': '用户名或密码错误'})
     else:
