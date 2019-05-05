@@ -34,11 +34,11 @@ def sign_up(request):
 
 
 def sign_in(request):
-    # name = request.POST.get('username')
-    # pwd = request.POST.get('password')
+    name = request.POST.get('username')
+    pwd = request.POST.get('password')
 
-    name = 'curry'
-    pwd = '123456'
+    # name = 'curry'
+    # pwd = '123456'
 
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
