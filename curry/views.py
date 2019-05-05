@@ -68,16 +68,24 @@ def search(request):
 
 
 def myself_edit(request):
-    # 修改个人信息
-    name = request.POST.get('username')
-    gender = request.POST.get('gender')
-    nick_name = request.POST.get('nick_name')
-    phone = request.POST.get('phone')
-    head_img = request.POST.get('head_img')
-    sign = request.POST.get('sign')
+    token = token_service.get_token(request)
+    if token:
+        user_info = token_service.check_token(token)
+    else:
+        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
 
-    models.User.objects.create(username=name, gender=gender, nick_name=nick_name,
-                               phone=phone, head_img=head_img, sign=sign)
+    user_obj = models.User.objects.filter(id=user_info['id']).first()
+
+    # 修改个人信息
+    user_obj.username = request.POST.get('username')
+    user_obj.gender = request.POST.get('gender')
+    user_obj.nick_name = request.POST.get('nick_name')
+    user_obj.phone = request.POST.get('phone')
+    user_obj.head_img = request.POST.get('head_img')
+    user_obj.sign = request.POST.get('sign')
+
+    user_obj.save()
+    return JsonResponse({'code': '0', 'error_msg': '修改成功'})
 
 
 def get_article_list(request):
@@ -91,21 +99,39 @@ def get_article_list(request):
 
 
 def publish(request):
+    token = token_service.get_token(request)
+    if token:
+        user_info = token_service.check_token(token)
+    else:
+        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+
     # 发表动态
     name = request.POST.get('username')
     title = request.POST.get('gender')
     content = request.POST.get('nick_name')
     img = request.POST.get('phone')
 
-    q = models.ArticleContent.objects.create(username=name, title=title, content=content, img=img)
+    q = models.ArticleContent.objects.create(username=name, title=title, content=content, img=img,
+                                             user_id=user_info['id'])
     if q:
         return JsonResponse({'code': '0', 'msg': '发表成功'})
     else:
         return JsonResponse({'code': '1', 'msg': '发表失败'})
 
 
-def get_like_and_comment(request, user_id):
+def get_like_and_comment(request):
+    token = token_service.get_token(request)
+    if token:
+        user_info = token_service.check_token(token)
+    else:
+        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
     # 获取用户收到的点赞及评论信息
-    models.ArticleLike.objects.filter(user_id=user_id)
-    # models.ArticleLike.objects.all().filter(user_id=user_id)
-    models.ArticleComment.objects.filter(user_id=user_id)
+    # like = models.ArticleLike.objects.filter(user_id=user_info['id']).all()
+    # # models.ArticleLike.objects.all().filter(user_id=user_id)
+    # comment = models.ArticleComment.objects.filter(user_id=user_info['id'])
+
+    return JsonResponse({
+        'code': 0, 'msg': '',
+        'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
+        'comment': models.ArticleComment.objects.filter(user_id=user_info['id'])
+    })
