@@ -56,7 +56,7 @@ def search(request):
     # 按标题搜索
     title = request.POST.get('title')
     if title:
-        article_list = ArticleContent.objects.all().filter(title=title)
+        article_list = ArticleContent.objects.filter(title=title)
 
         if len(article_list) > 0:
             return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': article_list})
@@ -90,8 +90,8 @@ def myself_edit(request):
 
 def get_article_list(request):
     # 获取全部动态内容
-    article_list = ArticleContent.objects.filter()
-    # article_list = ArticleContent.objects.all()
+    # article_list = ArticleContent.objects.filter()
+    article_list = ArticleContent.objects.all()
     if len(article_list) > 0:
         return JsonResponse({'code': '0', 'msg': '加载成功', 'article_list': article_list})
     else:
