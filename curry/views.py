@@ -1,19 +1,10 @@
-# from django.shortcuts import render
 from django.http import JsonResponse
 from .models import *
 from curry import models
-from scmvp.token_service import token_service
-
-
-# from rest_framework_jwt.settings import api_settings
+from scmvp.token_service import TokenService
 
 
 def sign_up(request):
-    # name = 'stephen'
-    # pwd = '123456'
-    # re_pwd = '123456'
-    # gender = '1'
-
     name = request.POST.get('username')
     pwd = request.POST.get('password')
     re_pwd = request.POST.get('re_pwd')
@@ -37,15 +28,12 @@ def sign_in(request):
     name = request.POST.get('username')
     pwd = request.POST.get('password')
 
-    # name = 'curry'
-    # pwd = '123456'
-
     if name and pwd:
         user_obj = models.User.objects.filter(username=name, password=pwd).first()
 
         if user_obj:
             return JsonResponse({'code': '0', 'msg': '登录成功',
-                                 'token': token_service.create_token({'id': user_obj.id, 'name': user_obj.username})})
+                                 'token': TokenService.create_token({'id': user_obj.id, 'name': user_obj.username})})
         else:
             return JsonResponse({'code': '1', 'msg': '用户名或密码错误'})
     else:
@@ -68,9 +56,9 @@ def search(request):
 
 
 def myself_edit(request):
-    token = token_service.get_token(request)
+    token = TokenService.get_token(request)
     if token:
-        user_info = token_service.check_token(token)
+        user_info = TokenService.check_token(token)
     else:
         return JsonResponse({'code': '1', 'error_msg': '需要登录'})
 
@@ -90,7 +78,6 @@ def myself_edit(request):
 
 def get_article_list(request):
     # 获取全部动态内容
-    # article_list = ArticleContent.objects.filter()
     article_list = ArticleContent.objects.all()
     if len(article_list) > 0:
         return JsonResponse({'code': '0', 'msg': '加载成功', 'article_list': article_list})
@@ -99,9 +86,9 @@ def get_article_list(request):
 
 
 def publish(request):
-    token = token_service.get_token(request)
+    token = TokenService.get_token(request)
     if token:
-        user_info = token_service.check_token(token)
+        user_info = TokenService.check_token(token)
     else:
         return JsonResponse({'code': '1', 'error_msg': '需要登录'})
 
@@ -120,16 +107,11 @@ def publish(request):
 
 
 def get_like_and_comment(request):
-    token = token_service.get_token(request)
+    token = TokenService.get_token(request)
     if token:
-        user_info = token_service.check_token(token)
+        user_info = TokenService.check_token(token)
     else:
         return JsonResponse({'code': '1', 'error_msg': '需要登录'})
-    # 获取用户收到的点赞及评论信息
-    # like = models.ArticleLike.objects.filter(user_id=user_info['id']).all()
-    # # models.ArticleLike.objects.all().filter(user_id=user_id)
-    # comment = models.ArticleComment.objects.filter(user_id=user_info['id'])
-
     return JsonResponse({
         'code': 0, 'msg': '',
         'like': models.ArticleLike.objects.filter(user_id=user_info['id']),

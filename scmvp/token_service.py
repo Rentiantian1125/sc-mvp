@@ -1,7 +1,7 @@
 import jwt
 
 
-class token_service:
+class TokenService:
     TOKEN_SECRET = 'sc-mvp'
     TOKEN_ENCRYPTION_METHOD = 'HS256'
 
@@ -14,9 +14,9 @@ class token_service:
 
     @staticmethod
     def create_token(payload):
-        return str(jwt.encode(payload, token_service.TOKEN_SECRET, token_service.TOKEN_ENCRYPTION_METHOD),
+        return str(jwt.encode(payload, TokenService.TOKEN_SECRET, TokenService.TOKEN_ENCRYPTION_METHOD),
                    encoding="utf8")
 
     @staticmethod
     def check_token(token):
-        return jwt.decode(token, token_service.TOKEN_SECRET, token_service.TOKEN_ENCRYPTION_METHOD)
+        return jwt.decode(token, TokenService.TOKEN_SECRET, TokenService.TOKEN_ENCRYPTION_METHOD)
