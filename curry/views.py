@@ -1,7 +1,9 @@
 from django.http import JsonResponse
+from django.shortcuts import HttpResponse
 from .models import *
 from curry import models
 from scmvp.token_service import TokenService
+import os
 
 
 def auth(func):
@@ -96,12 +98,22 @@ def get_article_list(request):
 
 
 @auth
+def upload_pic(request):
+    file_obj = request.FILES.get('pic')
+    file_path = os.path.join('static/images', file_obj.name)
+    with open(file_path, 'wb') as f:
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+    return HttpResponse(file_path)
+
+
+@auth
 def publish(request, user_info):
     # 发表动态
     name = request.POST.get('username')
     title = request.POST.get('gender')
     content = request.POST.get('nick_name')
-    img = request.POST.get('phone')
+    img = request.POST.get('img')
 
     q = models.ArticleContent.objects.create(username=name, title=title, content=content, img=img,
                                              user_id=user_info['id'])

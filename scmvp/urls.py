@@ -26,6 +26,7 @@ urlpatterns = [
     path('get_article_list/', views.get_article_list),
     path('publish/', views.publish),
     path('get_like_and_comment/', views.get_like_and_comment),
+    path('upload_pic/', views.upload_pic),
 
 ]
 
