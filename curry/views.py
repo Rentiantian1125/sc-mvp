@@ -98,6 +98,27 @@ def get_article_list(request):
 
 
 @auth
+def like(request, user_info):
+    article_id = request.POST.get('article_id')
+    if article_id:
+        models.ArticleLike.objects.create(user_id=user_info['id'], article_id=article_id)
+        return JsonResponse({'code': '0', 'msg': '点赞成功'})
+    else:
+        return JsonResponse({'code': '1', 'msg': 'gg'})
+
+
+@auth
+def comment(request, user_info):
+    comment_content = request.POST.get('comment')
+    article_id = request.POST.get('article_id')
+    if comment_content and article_id:
+        models.ArticleComment.objects.create(user_id=user_info['id'], article_id=article_id, comment=comment_content)
+        return JsonResponse({'code': '0', 'msg': '评论成功'})
+    else:
+        return JsonResponse({'code': '1', 'msg': 'gg'})
+
+
+@auth
 def upload_pic(request):
     file_obj = request.FILES.get('pic')
     file_path = os.path.join('static/images', file_obj.name)
