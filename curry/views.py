@@ -4,6 +4,18 @@ from curry import models
 from scmvp.token_service import TokenService
 
 
+def auth(func):
+    def view(request):
+        token = TokenService.get_token(request)
+        if token:
+            user_info = TokenService.check_token(token)
+        else:
+            return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+        return func(request, user_info)
+
+    return view
+
+
 def sign_up(request):
     name = request.POST.get('username')
     pwd = request.POST.get('password')
@@ -19,7 +31,6 @@ def sign_up(request):
                 return JsonResponse({'code': '0', 'msg': "保存成功"})
         else:
             return JsonResponse({'code': '1', 'msg': '密码不一致'})
-
     else:
         return JsonResponse({'code': '1', 'msg': '输入不能为空'})
 
@@ -50,7 +61,6 @@ def search(request):
             return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': article_list})
         else:
             return JsonResponse({'code': '1', 'msg': '没有匹配项'})
-
     else:
         return JsonResponse({'code': '1', 'error_msg': '输入为空'})
 
@@ -85,13 +95,8 @@ def get_article_list(request):
         return JsonResponse({'code': '1', 'msg': '无数据'})
 
 
-def publish(request):
-    token = TokenService.get_token(request)
-    if token:
-        user_info = TokenService.check_token(token)
-    else:
-        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
-
+@auth
+def publish(request, user_info):
     # 发表动态
     name = request.POST.get('username')
     title = request.POST.get('gender')
@@ -106,35 +111,8 @@ def publish(request):
         return JsonResponse({'code': '1', 'msg': '发表失败'})
 
 
-def auth(func):
-    def view(request):
-        token = TokenService.get_token(request)
-        if token:
-            user_info = TokenService.check_token(token)
-        else:
-            return JsonResponse({'code': '1', 'error_msg': '需要登录'})
-        return func(request, user_info)
-
-    return view
-
-
 @auth
 def get_like_and_comment(request, user_info):
-
-    # token = token_service.get_token(request)
-    # if token:
-    #     user_info = token_service.check_token(token)
-    # else:
-    #     return JsonResponse({'code': '1', 'error_msg': '需要登录'})
-
-    # 获取用户收到的点赞及评论信息
-    # like = models.ArticleLike.objects.filter(user_id=user_info['id']).all()
-    # # models.ArticleLike.objects.all().filter(user_id=user_id)
-    # comment = models.ArticleComment.objects.filter(user_id=user_info['id'])
-
-    # print(models.ArticleLike.objects.filter(user_id=user_info['id']))
-    # exit()
-
     return JsonResponse({
         'code': 0, 'msg': '',
         'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
