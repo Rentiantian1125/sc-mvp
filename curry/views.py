@@ -106,12 +106,35 @@ def publish(request):
         return JsonResponse({'code': '1', 'msg': '发表失败'})
 
 
-def get_like_and_comment(request):
-    token = TokenService.get_token(request)
-    if token:
-        user_info = TokenService.check_token(token)
-    else:
-        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+def auth(func):
+    def view(request):
+        token = TokenService.get_token(request)
+        if token:
+            user_info = TokenService.check_token(token)
+        else:
+            return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+        return func(request, user_info)
+
+    return view
+
+
+@auth
+def get_like_and_comment(request, user_info):
+
+    # token = token_service.get_token(request)
+    # if token:
+    #     user_info = token_service.check_token(token)
+    # else:
+    #     return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+
+    # 获取用户收到的点赞及评论信息
+    # like = models.ArticleLike.objects.filter(user_id=user_info['id']).all()
+    # # models.ArticleLike.objects.all().filter(user_id=user_id)
+    # comment = models.ArticleComment.objects.filter(user_id=user_info['id'])
+
+    # print(models.ArticleLike.objects.filter(user_id=user_info['id']))
+    # exit()
+
     return JsonResponse({
         'code': 0, 'msg': '',
         'like': models.ArticleLike.objects.filter(user_id=user_info['id']),

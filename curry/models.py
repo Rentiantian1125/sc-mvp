@@ -19,7 +19,7 @@ class User(models.Model):
 class ArticleLike(models.Model):
     article_id = models.IntegerField()
     user_id = models.IntegerField()
-    nice_name = models.CharField(max_length=30)
+    create_time = models.TimeField()
 
     class Meta:
         db_table = 'article_like'
@@ -29,7 +29,7 @@ class ArticleComment(models.Model):
     article_id = models.IntegerField()
     user_id = models.IntegerField()
     comment = models.CharField(max_length=30)
-    create_time = models.CharField(max_length=30)
+    create_time = models.TimeField()
 
     class Meta:
         db_table = 'article_comment'
