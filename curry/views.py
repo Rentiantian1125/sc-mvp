@@ -147,7 +147,7 @@ def publish(request, user_info):
 @auth
 def get_like_and_comment(request, user_info):
     return JsonResponse({
-        'code': 0, 'msg': '',
+        'code': 0, 'msg': '获取成功',
         'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
         'comment': models.ArticleComment.objects.filter(user_id=user_info['id'])
     })
