@@ -1,8 +1,9 @@
+from uuid import uuid1
 from django.http import JsonResponse
-from django.shortcuts import HttpResponse
 from .models import *
 from curry import models
 from scmvp.token_service import TokenService
+from django.forms.models import model_to_dict
 import os
 
 
@@ -90,11 +91,20 @@ def myself_edit(request):
 
 def get_article_list(request):
     # 获取全部动态内容
-    article_list = ArticleContent.objects.all()
+    article_list = ArticleContent.objects.values()
     if len(article_list) > 0:
-        return JsonResponse({'code': '0', 'msg': '加载成功', 'article_list': article_list})
+        return JsonResponse({'code': '0', 'msg': '加载成功', 'data': list(article_list)})
     else:
         return JsonResponse({'code': '1', 'msg': '无数据'})
+
+
+def get_article_content(request):
+    article_id = request.POST.get('id')
+    article_content = model_to_dict(ArticleContent.objects.get(id=article_id))
+    article_comment = ArticleComment.objects.values().filter(article_id=article_id)
+    article_content['article_comment'] = list(article_comment)
+
+    return JsonResponse({'code': '0', 'msg': '加载成功', 'data': article_content})
 
 
 @auth
@@ -118,26 +128,26 @@ def comment(request, user_info):
         return JsonResponse({'code': '1', 'msg': 'gg'})
 
 
-@auth
 def upload_pic(request):
-    file_obj = request.FILES.get('pic')
-    file_path = os.path.join('static/images', file_obj.name)
+    file_obj = request.FILES.get('img')
+    save_name = str(uuid1()) + os.path.splitext(file_obj.name)[1]
+    save_path = 'static/img/'
+    file_path = os.path.join(save_path, save_name)
     with open(file_path, 'wb') as f:
         for chunk in file_obj.chunks():
             f.write(chunk)
-    return HttpResponse(file_path)
+    return JsonResponse(
+        {'result': '0', 'message': '', 'data': {'url': 'http://127.0.0.1:8000/' + save_path + save_name}})
 
 
 @auth
 def publish(request, user_info):
     # 发表动态
-    name = request.POST.get('username')
-    title = request.POST.get('gender')
-    content = request.POST.get('nick_name')
+    title = request.POST.get('title')
+    content = request.POST.get('content')
     img = request.POST.get('img')
 
-    q = models.ArticleContent.objects.create(username=name, title=title, content=content, img=img,
-                                             user_id=user_info['id'])
+    q = models.ArticleContent.objects.create(title=title, content=content, img=img, user_id=user_info['id'])
     if q:
         return JsonResponse({'code': '0', 'msg': '发表成功'})
     else:

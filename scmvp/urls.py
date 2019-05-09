@@ -23,11 +23,12 @@ urlpatterns = [
     path('sign_in', views.sign_in),
     path('search/', views.search),
     path('myself_edit/', views.myself_edit),
-    path('get_article_list/', views.get_article_list),
-    path('publish/', views.publish),
+    path('get_article_list', views.get_article_list),
+    path('get_article_content', views.get_article_content),
+    path('publish', views.publish),
     path('get_like_and_comment/', views.get_like_and_comment),
-    path('upload_pic/', views.upload_pic),
-    path('comment/', views.comment),
+    path('upload_pic', views.upload_pic),
+    path('comment', views.comment),
     path('like/', views.like),
 
 ]
