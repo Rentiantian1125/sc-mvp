@@ -54,35 +54,35 @@ def sign_in(request):
         return JsonResponse({'code': '1', 'msg': '输入为空'})
 
 
+@auth
+def get_user_info(request, user_info):
+    user = User.objects.get(id=user_info['id'])
+    return JsonResponse({'code': '0', 'msg': '搜索成功', 'data': model_to_dict(user)})
+
+
 def search(request):
     # 按标题搜索
     title = request.POST.get('title')
     if title:
-        article_list = ArticleContent.objects.filter(title=title)
+        article_list = ArticleContent.objects.values().filter(title=title)
 
         if len(article_list) > 0:
-            return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': article_list})
+            return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': list(article_list)})
         else:
             return JsonResponse({'code': '1', 'msg': '没有匹配项'})
     else:
         return JsonResponse({'code': '1', 'error_msg': '输入为空'})
 
 
-def myself_edit(request):
-    token = TokenService.get_token(request)
-    if token:
-        user_info = TokenService.check_token(token)
-    else:
-        return JsonResponse({'code': '1', 'error_msg': '需要登录'})
+@auth
+def myself_edit(request, user_info):
 
     user_obj = models.User.objects.filter(id=user_info['id']).first()
 
     # 修改个人信息
-    user_obj.username = request.POST.get('username')
     user_obj.gender = request.POST.get('gender')
     user_obj.nick_name = request.POST.get('nick_name')
-    user_obj.phone = request.POST.get('phone')
-    user_obj.head_img = request.POST.get('head_img')
+    # user_obj.head_img = request.POST.get('head_img')
     user_obj.sign = request.POST.get('sign')
 
     user_obj.save()
@@ -99,10 +99,18 @@ def get_article_list(request):
 
 
 def get_article_content(request):
+    token = TokenService.get_token(request)
+    user_id = 0 if not token else TokenService.check_token(token)['id']
+
     article_id = request.POST.get('id')
     article_content = model_to_dict(ArticleContent.objects.get(id=article_id))
-    article_comment = ArticleComment.objects.values().filter(article_id=article_id)
+
+    article_comment = ArticleComment.objects\
+        .values('article_id', 'comment', 'user__nick_name', 'user__head_img')\
+        .filter(article_id=article_id)
+
     article_content['article_comment'] = list(article_comment)
+    article_content['is_like'] = ArticleLike.objects.filter(user_id=user_id, article_id=article_id).count()
 
     return JsonResponse({'code': '0', 'msg': '加载成功', 'data': article_content})
 

@@ -3,6 +3,7 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
+    # id = models.IntegerField()
     username = models.CharField(max_length=30)
     password = models.CharField(max_length=30)
     nick_name = models.CharField(max_length=30)
@@ -28,11 +29,15 @@ class ArticleLike(models.Model):
 
 class ArticleComment(models.Model):
     article_id = models.IntegerField()
-    user_id = models.IntegerField()
+    # user_id = models.IntegerField()
     comment = models.CharField(max_length=30)
     # create_time = models.TimeField()
 
-    # user = models.OneToOneField("User")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+
+    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
+    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
+    # comment_user = models.OneToOneField("User", on_delete=None)
 
     class Meta:
         db_table = 'article_comment'
