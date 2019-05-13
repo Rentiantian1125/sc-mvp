@@ -32,5 +32,6 @@ urlpatterns = [
     path('like', views.like),
     path('get_user_info', views.get_user_info),
     path('follow', views.follow),
+    path('upload_head_pic', views.upload_head_pic),
 ]
 

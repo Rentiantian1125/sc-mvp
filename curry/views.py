@@ -178,3 +178,15 @@ def follow(request, user_info):
         return JsonResponse({'code': '0', 'msg': '关注成功'})
     else:
         return JsonResponse({'code': '1', 'msg': 'gg'})
+
+
+def upload_head_pic(request):
+    file_obj = request.FILES.get('img')
+    save_name = str(uuid1()) + os.path.splitext(file_obj.name)[1]
+    save_path = 'static/head_img/'
+    file_path = os.path.join(save_path, save_name)
+    with open(file_path, 'wb') as f:
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+    return JsonResponse(
+        {'result': '0', 'message': '', 'data': {'url': 'http://127.0.0.1:8000/' + save_path + save_name}})
