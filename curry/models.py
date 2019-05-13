@@ -18,21 +18,40 @@ class User(models.Model):
         db_table = 'user'
 
 
+class Article(models.Model):
+    # user_id = models.IntegerField()
+    title = models.CharField(max_length=30)
+    content = models.CharField(max_length=30)
+    img = models.CharField(max_length=30)
+
+    # create_time = models.CharField(max_length=30)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+
+    class Meta:
+        db_table = 'article_content'
+
+
 class ArticleLike(models.Model):
-    article_id = models.IntegerField()
-    user_id = models.IntegerField()
+    # article_id = models.IntegerField()
+    # user_id = models.IntegerField()
+
     # create_time = models.TimeField()
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, db_constraint=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
 
     class Meta:
         db_table = 'article_like'
 
 
 class ArticleComment(models.Model):
-    article_id = models.IntegerField()
+    # article_id = models.IntegerField()
     # user_id = models.IntegerField()
     comment = models.CharField(max_length=30)
     # create_time = models.TimeField()
 
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, db_constraint=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
 
     # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
@@ -41,15 +60,3 @@ class ArticleComment(models.Model):
 
     class Meta:
         db_table = 'article_comment'
-
-
-class ArticleContent(models.Model):
-    user_id = models.IntegerField()
-    title = models.CharField(max_length=30)
-    content = models.CharField(max_length=30)
-    img = models.CharField(max_length=30)
-
-    # create_time = models.CharField(max_length=30)
-
-    class Meta:
-        db_table = 'article_content'

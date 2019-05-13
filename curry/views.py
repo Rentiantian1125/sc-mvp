@@ -64,7 +64,7 @@ def search(request):
     # 按标题搜索
     title = request.POST.get('title')
     if title:
-        article_list = ArticleContent.objects.values().filter(title=title)
+        article_list = Article.objects.values().filter(title=title)
 
         if len(article_list) > 0:
             return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': list(article_list)})
@@ -76,7 +76,6 @@ def search(request):
 
 @auth
 def myself_edit(request, user_info):
-
     user_obj = models.User.objects.filter(id=user_info['id']).first()
 
     # 修改个人信息
@@ -91,7 +90,7 @@ def myself_edit(request, user_info):
 
 def get_article_list(request):
     # 获取全部动态内容
-    article_list = ArticleContent.objects.values()
+    article_list = Article.objects.values()
     if len(article_list) > 0:
         return JsonResponse({'code': '0', 'msg': '加载成功', 'data': list(article_list)})
     else:
@@ -103,10 +102,10 @@ def get_article_content(request):
     user_id = 0 if not token else TokenService.check_token(token)['id']
 
     article_id = request.POST.get('id')
-    article_content = model_to_dict(ArticleContent.objects.get(id=article_id))
+    article_content = model_to_dict(Article.objects.get(id=article_id))
 
-    article_comment = ArticleComment.objects\
-        .values('article_id', 'comment', 'user__nick_name', 'user__head_img')\
+    article_comment = ArticleComment.objects \
+        .values('article_id', 'comment', 'user__nick_name', 'user__head_img') \
         .filter(article_id=article_id)
 
     article_content['article_comment'] = list(article_comment)
@@ -155,7 +154,7 @@ def publish(request, user_info):
     content = request.POST.get('content')
     img = request.POST.get('img')
 
-    q = models.ArticleContent.objects.create(title=title, content=content, img=img, user_id=user_info['id'])
+    q = models.Article.objects.create(title=title, content=content, img=img, user_id=user_info['id'])
     if q:
         return JsonResponse({'code': '0', 'msg': '发表成功'})
     else:
@@ -169,3 +168,12 @@ def get_like_and_comment(request, user_info):
         'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
         'comment': models.ArticleComment.objects.filter(user_id=user_info['id'])
     })
+
+
+def test(request):
+
+    # articlecomment = ArticleComment.objects.select_related('article').filter(article__user_id=1).query
+
+    articlecomment = Article.objects.values('id', 'articlecomment').filter(user_id=1)
+
+    return JsonResponse(list(articlecomment), safe=False)
