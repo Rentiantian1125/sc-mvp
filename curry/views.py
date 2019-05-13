@@ -76,7 +76,6 @@ def search(request):
 
 @auth
 def myself_edit(request, user_info):
-
     user_obj = models.User.objects.filter(id=user_info['id']).first()
 
     # 修改个人信息
@@ -105,8 +104,8 @@ def get_article_content(request):
     article_id = request.POST.get('id')
     article_content = model_to_dict(ArticleContent.objects.get(id=article_id))
 
-    article_comment = ArticleComment.objects\
-        .values('article_id', 'comment', 'user__nick_name', 'user__head_img')\
+    article_comment = ArticleComment.objects \
+        .values('article_id', 'comment', 'user__nick_name', 'user__head_img') \
         .filter(article_id=article_id)
 
     article_content['article_comment'] = list(article_comment)
@@ -166,6 +165,16 @@ def publish(request, user_info):
 def get_like_and_comment(request, user_info):
     return JsonResponse({
         'code': 0, 'msg': '获取成功',
-        'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
-        'comment': models.ArticleComment.objects.filter(user_id=user_info['id'])
+        'like': ArticleLike.objects.select_related('ArticleLike').filter(article__user_id=user_info['id']),
+        'comment': ArticleComment.objects.select_related('ArticleComment').filter(article__user_id=user_info['id'])
     })
+
+
+@auth
+def follow(request, user_info):
+    user_id = request.POST.get('user_id')
+    if user_id:
+        models.FriendShip.objects.create(follow_id=user_id, fan_id=user_info['id'])
+        return JsonResponse({'code': '0', 'msg': '关注成功'})
+    else:
+        return JsonResponse({'code': '1', 'msg': 'gg'})

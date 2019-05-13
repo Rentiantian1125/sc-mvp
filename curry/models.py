@@ -18,31 +18,6 @@ class User(models.Model):
         db_table = 'user'
 
 
-class ArticleLike(models.Model):
-    article_id = models.IntegerField()
-    user_id = models.IntegerField()
-    # create_time = models.TimeField()
-
-    class Meta:
-        db_table = 'article_like'
-
-
-class ArticleComment(models.Model):
-    article_id = models.IntegerField()
-    # user_id = models.IntegerField()
-    comment = models.CharField(max_length=30)
-    # create_time = models.TimeField()
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
-
-    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
-    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
-    # comment_user = models.OneToOneField("User", on_delete=None)
-
-    class Meta:
-        db_table = 'article_comment'
-
-
 class ArticleContent(models.Model):
     user_id = models.IntegerField()
     title = models.CharField(max_length=30)
@@ -53,3 +28,33 @@ class ArticleContent(models.Model):
 
     class Meta:
         db_table = 'article_content'
+
+
+class ArticleLike(models.Model):
+    # article_id = models.IntegerField()
+    # user_id = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+    article = models.ForeignKey(ArticleContent, on_delete=models.CASCADE, db_constraint=False)
+
+    # create_time = models.TimeField()
+
+    class Meta:
+        db_table = 'article_like'
+
+
+class ArticleComment(models.Model):
+    comment = models.CharField(max_length=30)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+    article = models.ForeignKey(ArticleContent, on_delete=models.CASCADE, db_constraint=False)
+
+    class Meta:
+        db_table = 'article_comment'
+
+
+class FriendShip(models.Model):
+    follow_id = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+    fan_id = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+
+    class Meta:
+        db_table = 'friendship'
