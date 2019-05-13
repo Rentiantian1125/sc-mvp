@@ -81,7 +81,7 @@ def myself_edit(request, user_info):
     # 修改个人信息
     user_obj.gender = request.POST.get('gender')
     user_obj.nick_name = request.POST.get('nick_name')
-    # user_obj.head_img = request.POST.get('head_img')
+    user_obj.head_img = request.POST.get('head_img')
     user_obj.sign = request.POST.get('sign')
 
     user_obj.save()
