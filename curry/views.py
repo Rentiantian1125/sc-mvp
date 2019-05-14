@@ -165,8 +165,8 @@ def publish(request, user_info):
 def get_like_and_comment(request, user_info):
     return JsonResponse({
         'code': 0, 'msg': '获取成功',
-        'like': ArticleLike.objects.select_related('ArticleLike').filter(article__user_id=user_info['id']),
-        'comment': ArticleComment.objects.select_related('ArticleComment').filter(article__user_id=user_info['id'])
+        'like': list(ArticleLike.objects.select_related('ArticleLike').filter(article__user_id=user_info['id'])),
+        'comment': list(ArticleComment.objects.select_related('ArticleComment').filter(article__user_id=user_info['id']))
     })
 
 

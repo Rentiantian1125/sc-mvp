@@ -31,8 +31,6 @@ class ArticleContent(models.Model):
 
 
 class ArticleLike(models.Model):
-    # article_id = models.IntegerField()
-    # user_id = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
     article = models.ForeignKey(ArticleContent, on_delete=models.CASCADE, db_constraint=False)
 
@@ -53,8 +51,8 @@ class ArticleComment(models.Model):
 
 
 class FriendShip(models.Model):
-    follow_id = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
-    fan_id = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+    follow = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False, related_name='follow_user')
+    fan = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False, related_name='fan_user')
 
     class Meta:
         db_table = 'friendship'
