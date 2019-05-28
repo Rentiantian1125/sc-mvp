@@ -18,45 +18,41 @@ class User(models.Model):
         db_table = 'user'
 
 
-class Article(models.Model):
-    # user_id = models.IntegerField()
+class ArticleContent(models.Model):
+    user_id = models.IntegerField()
     title = models.CharField(max_length=30)
     content = models.CharField(max_length=30)
     img = models.CharField(max_length=30)
 
     # create_time = models.CharField(max_length=30)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
-
     class Meta:
         db_table = 'article_content'
 
 
 class ArticleLike(models.Model):
-    # article_id = models.IntegerField()
-    # user_id = models.IntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
+    article = models.ForeignKey(ArticleContent, on_delete=models.CASCADE, db_constraint=False)
 
     # create_time = models.TimeField()
-
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, db_constraint=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
 
     class Meta:
         db_table = 'article_like'
 
 
 class ArticleComment(models.Model):
-    # article_id = models.IntegerField()
-    # user_id = models.IntegerField()
     comment = models.CharField(max_length=30)
-    # create_time = models.TimeField()
 
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, db_constraint=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False)
-
-    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
-    # user = models.ForeignKey(User, to_field=User.id, db_constraint=False, on_delete=None)
-    # comment_user = models.OneToOneField("User", on_delete=None)
+    article = models.ForeignKey(ArticleContent, on_delete=models.CASCADE, db_constraint=False)
 
     class Meta:
         db_table = 'article_comment'
+
+
+class FriendShip(models.Model):
+    follow = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False, related_name='follow_user')
+    fan = models.ForeignKey(User, on_delete=models.CASCADE, db_constraint=False, related_name='fan_user')
+
+    class Meta:
+        db_table = 'friendship'

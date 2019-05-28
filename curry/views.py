@@ -64,7 +64,7 @@ def search(request):
     # 按标题搜索
     title = request.POST.get('title')
     if title:
-        article_list = Article.objects.values().filter(title=title)
+        article_list = ArticleContent.objects.values().filter(title=title)
 
         if len(article_list) > 0:
             return JsonResponse({'code': '0', 'msg': '搜索成功', 'article_list': list(article_list)})
@@ -81,7 +81,7 @@ def myself_edit(request, user_info):
     # 修改个人信息
     user_obj.gender = request.POST.get('gender')
     user_obj.nick_name = request.POST.get('nick_name')
-    # user_obj.head_img = request.POST.get('head_img')
+    user_obj.head_img = request.POST.get('head_img')
     user_obj.sign = request.POST.get('sign')
 
     user_obj.save()
@@ -90,7 +90,7 @@ def myself_edit(request, user_info):
 
 def get_article_list(request):
     # 获取全部动态内容
-    article_list = Article.objects.values()
+    article_list = ArticleContent.objects.values()
     if len(article_list) > 0:
         return JsonResponse({'code': '0', 'msg': '加载成功', 'data': list(article_list)})
     else:
@@ -102,7 +102,7 @@ def get_article_content(request):
     user_id = 0 if not token else TokenService.check_token(token)['id']
 
     article_id = request.POST.get('id')
-    article_content = model_to_dict(Article.objects.get(id=article_id))
+    article_content = model_to_dict(ArticleContent.objects.get(id=article_id))
 
     article_comment = ArticleComment.objects \
         .values('article_id', 'comment', 'user__nick_name', 'user__head_img') \
@@ -154,7 +154,7 @@ def publish(request, user_info):
     content = request.POST.get('content')
     img = request.POST.get('img')
 
-    q = models.Article.objects.create(title=title, content=content, img=img, user_id=user_info['id'])
+    q = models.ArticleContent.objects.create(title=title, content=content, img=img, user_id=user_info['id'])
     if q:
         return JsonResponse({'code': '0', 'msg': '发表成功'})
     else:
@@ -165,15 +165,28 @@ def publish(request, user_info):
 def get_like_and_comment(request, user_info):
     return JsonResponse({
         'code': 0, 'msg': '获取成功',
-        'like': models.ArticleLike.objects.filter(user_id=user_info['id']),
-        'comment': models.ArticleComment.objects.filter(user_id=user_info['id'])
+        'like': list(ArticleLike.objects.select_related('ArticleLike').filter(article__user_id=user_info['id'])),
+        'comment': list(ArticleComment.objects.select_related('ArticleComment').filter(article__user_id=user_info['id']))
     })
 
 
-def test(request):
+@auth
+def follow(request, user_info):
+    user_id = request.POST.get('user_id')
+    if user_id:
+        models.FriendShip.objects.create(follow_id=user_id, fan_id=user_info['id'])
+        return JsonResponse({'code': '0', 'msg': '关注成功'})
+    else:
+        return JsonResponse({'code': '1', 'msg': 'gg'})
 
-    # articlecomment = ArticleComment.objects.select_related('article').filter(article__user_id=1).query
 
-    articlecomment = Article.objects.values('id', 'articlecomment').filter(user_id=1)
-
-    return JsonResponse(list(articlecomment), safe=False)
+def upload_head_pic(request):
+    file_obj = request.FILES.get('img')
+    save_name = str(uuid1()) + os.path.splitext(file_obj.name)[1]
+    save_path = 'static/head_img/'
+    file_path = os.path.join(save_path, save_name)
+    with open(file_path, 'wb') as f:
+        for chunk in file_obj.chunks():
+            f.write(chunk)
+    return JsonResponse(
+        {'result': '0', 'message': '', 'data': {'url': 'http://127.0.0.1:8000/' + save_path + save_name}})
